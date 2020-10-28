@@ -3,8 +3,6 @@ import os
 from pyspark import SparkConf
 from pyspark.context import SparkContext
 from pyspark.sql import *
-import json
-from random import randint
 from itertools import combinations
 from graphframes import *
 
