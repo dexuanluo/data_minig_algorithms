@@ -15,7 +15,14 @@ THRESHOLD = 0.5
 MAGIC_NUMBER = 10000000000000
 
 class GraphSolver:
-
+    """
+    USAGE:
+    vertices = [1,2,3]
+    edges = [(1,2),(2,3),(1,3)]
+    graph = GraphSolver(vertices, edges)                              
+    graph.GirvanNewman(max_iter = 50, base = 1)
+    res = graph.extract_communities()
+    """
     def __init__(self, vertices, edges):
         self.vertices = vertices[:]
         self.edges = edges[:]
@@ -153,18 +160,15 @@ class GraphSolver:
             if modularity > self.best_modularity:
                 self.best_communities = self.groups[:]
                 self.best_modularity = modularity
-            
             count += 1
             if not betweenness or count >= max_iter:
                 break
 
     def get_modularity(self, betweenness, base):
         m =  len(betweenness)
-
+        if m == 0: return -float("Inf")
         partition = {}
-
         modularity = {}
-
         for i in range(len(self.groups)):
             if self.groups[i] not in partition:
                 partition[self.groups[i]] = []
@@ -175,7 +179,7 @@ class GraphSolver:
             for pair in combinations(partition[group], 2):
                 vertex1, vertex2 = pair
                 modularity[group] += self.adjacency_matrix[vertex1][vertex2]\
-                     - (self.degrees[vertex1] * self.degrees[vertex2]) / (base * m)
+                     - ((self.degrees[vertex1] * self.degrees[vertex2]) / (base * m))
         
         return sum([modularity[group] for group in modularity]) / (2 * m)
             
@@ -248,7 +252,9 @@ if __name__ == "__main__":
                                             .map(lambda x : (x[0][0], x[1][0], x[2] / (x[0][1] + x[1][1] - x[2])))\
                                                 .filter(lambda x : x[2] >= THRESHOLD)\
                                                     .map(lambda x : x[:2])
-
+    """
+    Make DAG Doubly Linked
+    """
     edges = edges.flatMap(lambda x : [x, x[::-1]])
 
     vertices = edges\
@@ -283,13 +289,15 @@ if __name__ == "__main__":
         res = graph.extract_communities()
 
     else:
-        graph.GirvanNewman(max_iter = 50, base = 1)
+        graph.GirvanNewman(max_iter = 58, base = 1)
         res = graph.extract_communities()
 
     for i in range(len(res)):
         for j in range(len(res[i])):
-            res[i][j] = "'" + all_users[res[i][j]] + "'" if res[i][j] < MAGIC_NUMBER else "'" + all_states[res[i][j]] + "'"
+            res[i][j] = "'" + all_users[res[i][j]] + "'" if res[i][j] < MAGIC_NUMBER else "'" + all_states[res[i][j] - MAGIC_NUMBER] + "'"
         res[i].sort()
+
+    res.sort(key = lambda x : (len(x), x))
 
     with open(community_output_path, "w") as f:
             for row in res:
