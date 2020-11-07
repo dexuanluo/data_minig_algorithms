@@ -1,3 +1,6 @@
 CF_LSH/data/test_review.json
 CF_LSH/data/train_review.json
+Clustering/data/bfr_test1/*
+Clustering/data/bfr_test2/*
 */output/*
+*/bin/__pycache__

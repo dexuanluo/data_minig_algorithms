@@ -3,20 +3,62 @@ import json
 from random import sample, randint
 
 class KMeans:
-    def __init__(self, matrix, ncluster):
+    def __init__(self, matrix, ncluster, random_init = True):
         self.matrix = matrix
-        self.centroids = [[0] * len(matrix[0]) for _ in range(ncluster)]
+        self.centroids = []
         self.ncluster = ncluster
-        self.membership = [randint(0, ncluster - 1) for _ in range(len(matrix))]
+        self.membership = None
+        if random_init:
+            self._random_init()
+        else:
+            self._centorids_init()
+    
+    def _random_init(self):
+        self.membership = [randint(0, self.ncluster - 1) for _ in range(len(self.matrix))]
+        self.centroids = [[0] * len(self.matrix[0]) for _ in range(self.ncluster)]
+        self.renew_centroids()
 
-    def train(self, max_iter = 50, tolerance = 0, dis_func = None):
+    def _centorids_init(self, dis_func = None):
+        if not dis_func:
+            dis_func = self.EuclideanDistance
+        self.membership = [-1 for _ in range(len(self.matrix))]
+        pool = set([i for i in range(len(self.membership))])
+        count = 1
+        last_idx = sample(pool, 1)[0]
+        last = self.matrix[last_idx]
+        self.centroids.append(last)
+        pool.remove(last_idx)
+
+        while count < self.ncluster:
+            max_dis = -float("Inf")
+            max_idx = -1
+            candidate = None
+            for i, point in enumerate(self.matrix):
+                dis = dis_func(point, last)
+                if dis > max_dis:
+                    max_dis = dis
+                    max_idx = i
+                    candidate = point
+            if max_idx in pool:
+                self.centroids.append(candidate)
+                last_idx = max_idx
+                last = candidate
+                pool.remove(last_idx)
+            else:
+                last_idx = sample(pool, 1)[0]
+                self.centroids.append(self.matrix[last_idx])
+                last = self.matrix[last_idx]
+                pool.remove(last_idx)
+            count += 1
+        
+
+    def kmeans_train(self, max_iter = 1000, tolerance = 0, dis_func = None):
         if not dis_func:
             dis_func = self.EuclideanDistance
         for _ in range(max_iter):
-            self.renew_centroids()
             res = self.renew_membership(dis_func, tolerance)
+            self.renew_centroids()
             if res: break
-            
         
     def _reset_centroids(self):
         for i in range(len(self.centroids)):
@@ -33,7 +75,7 @@ class KMeans:
         
         for i in range(len(self.centroids)):
             for j in range(len(self.centroids[i])):
-                self.centroids[i][j] /= (counter[i] + 0.00000000001)
+                self.centroids[i][j] /= (counter[i] + 0.00000001)
         
         
     def renew_membership(self, dis_func, tolerance):
@@ -59,18 +101,23 @@ if __name__ == "__main__":
     output_path = sys.argv[3]
 
     matrix = []
+    
     with open(input_path, "r") as f:
         line  = f.readline()
         while line:
             arr = line.split(",")
+            
             for i in range(len(arr)):
                 arr[i] = float(arr[i])
-            matrix.append(arr)
+            
+            matrix.append(arr[1:])
+            
             line = f.readline()
+    
+    
+    kmeans = KMeans(matrix, ncluster, random_init=False)
 
-    kmeans = KMeans(matrix, ncluster)
-
-    kmeans.train(max_iter=1000)
-
+    kmeans.kmeans_train(max_iter=1000)
+    
     with open(output_path, "w") as f:
         f.write(kmeans.jsonify())
