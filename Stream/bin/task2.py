@@ -19,9 +19,9 @@ def hash_gen(k, m):
     n = 0
     seen = set()
     while n < k:
-        a, b = randint(1, sys.maxsize - 1), randint(0, sys.maxsize - 1)
+        a, b = randint(1, 2**64), randint(0, 2**64)
         while (a, b) in seen:
-            a, b = randint(1, sys.maxsize - 1), randint(0, sys.maxsize - 1)
+            a, b = randint(1, 2**64), randint(0, 2**64)
         func_arr.append(hash_func_decorator(a, b, m))
         seen.add((a, b))
         n += 1
@@ -63,11 +63,11 @@ def FajoetMartin(rdd, path, num_hash, num_partition, num_bucket, encode_scheme):
                 s += est[i]
                 denominator += 1
             else:
-                avg.append(s // denominator)
+                avg.append(s / denominator)
                 s = est[i]
                 denominator = 1
         if denominator:
-            avg.append(s // denominator)
+            avg.append(s / denominator)
         avg.sort()
         fd.write("{},{},{}\n".format(str(start), str(ground_truth), str(avg[len(avg) // 2])))
 
