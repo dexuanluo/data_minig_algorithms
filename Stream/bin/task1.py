@@ -41,8 +41,8 @@ class BloomFilter:
                 return False
         return True
 
-NUM_BCKT = 10000000
-NUM_HASH = 100
+NUM_BCKT = 250000
+NUM_HASH = 10
 TAG_NAME = "name"
 
 if __name__ == "__main__":
@@ -72,7 +72,6 @@ if __name__ == "__main__":
         bf.train(num)
     
     res = []
-    
     with open(input_path2, "r") as f:
         line = f.readline()
         while line:
@@ -83,7 +82,8 @@ if __name__ == "__main__":
             else:
                 res.append("F")
             line = f.readline()
-
+    
+    
     with open(output_path, "w") as f:
         f.write(" ".join(res))
 
