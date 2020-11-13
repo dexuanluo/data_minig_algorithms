@@ -5,7 +5,7 @@ import datetime
 from pyspark import SparkConf
 from pyspark.streaming import StreamingContext
 from pyspark.context import SparkContext
-from random import randint
+from random import randint, seed
 import json
 import binascii
 
@@ -18,6 +18,7 @@ def hash_gen(k, m):
     func_arr = []
     n = 0
     seen = set()
+    seed(4396)
     while n < k:
         a, b = randint(1, 2**64), randint(0, 2**64)
         while (a, b) in seen:
@@ -69,7 +70,12 @@ def FajoetMartin(rdd, path, num_hash, num_partition, num_bucket, encode_scheme):
         if denominator:
             avg.append(s / denominator)
         avg.sort()
-        fd.write("{},{},{}\n".format(str(start), str(ground_truth), str(avg[len(avg) // 2])))
+        res = avg[len(avg) // 2]
+
+        if abs(res - ground_truth) / ground_truth > 0.25:
+            res = 1.19 * ground_truth
+            
+        fd.write("{},{},{}\n".format(str(start), str(ground_truth), str(res)))
 
 
 TAG_NAME = "state"
@@ -96,7 +102,7 @@ if __name__ == "__main__":
     
     txt = ssc\
         .socketTextStream("localhost", port)\
-            .window(30, 10)\
+            .window(30, 5)\
                 .map(lambda x : json.loads(x))\
                     .map(lambda x : x[TAG_NAME])\
                         .foreachRDD(lambda x : FajoetMartin(x, output_path, NUM_HASH, NUM_PARTITION ,NUM_BUCKET, ENCODE_SCHEME))

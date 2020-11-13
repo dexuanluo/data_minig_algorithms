@@ -1,3 +1,5 @@
+task3:
+	spark-submit bin/task3.py 8087 output/task3.out
 task2:
 	spark-submit bin/task2.py 8087 output/task2.out
 task1:
