@@ -2,10 +2,10 @@ import sys
 import tweepy
 from random import uniform, randint
 
-API_KEY = "ZqQKp99039OZRm3UHAbhkcqwC"
-API_SECRET = "SDPCn4nSeeyygKM8egVNkH1P1WsRWD6KlQ6rfX0OsNWBrDFPhJ"
-ACCESS_TOKEN = "3402071777-PSWkQn41zK6FNZkXzM09F4nmPkwIllouK3hWQON"
-ACCESS_SECRET = "zIv1r5BXb0EOX6Vpa3zWbraU7vPHFhyPb8BZHEYeWxIfB"
+API_KEY = ""
+API_SECRET = ""
+ACCESS_TOKEN = ""
+ACCESS_SECRET = ""
 HASHTAGS = "hashtags"
 TEXT = "text"
 FILTER = ["LeagueOfLegends", "Google", "Konami", "Nintendo", "Pokemon", "Trump", "Biden", "Anna", "CAPCOM", "Pokimane", "PewDiePie", "Hentai","Monster Hunter Rise"]
